@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.org/marcmo/bitstream.svg?branch=master)](http://travis-ci.org/marcmo/bitstream)
+[![Build Status](https://travis-ci.org/AdrianPeniak/bitstream.svg?branch=master)](http://travis-ci.org/AdrianPeniak/bitstream)
 
 # Bitstream
 
-small utility functions for serialization and de-serialization of data
+small utility functions for serialization and de-serialization of data forked and edited from https://github.com/marcmo/bitstream 
 
 ## Example Usecase
 
@@ -12,64 +12,50 @@ write or read incoming/outgoing datastreams for protocols
 
 ### Writing bits to a stream
 
-    uint8_t data[1];
-    BitstreamWriter bs(data, 1);
-    bs.put<2>(0b11);
-    bs.put<3>(0b101);
+    std::vector<uint8_t> vec{};
+    BiteStream bs(std::move(vec));
+    bs.put<uint8_t>(13,4);
+    bs.put<uint8_t>(45,7);
+    bs.put<uint8_t>(6,3);
+    bs.put<uint16_t>(16385,16);
 
 ### Reading bits from a stream
 
-    uint8_t data[2];
-    data[0] = 0b00000011;
-    data[1] = 0b10101110;
-    ...
-    BitstreamReader bs(data, 2);
-    uint16_t a = bs.get<10>();
-    uint16_t b = bs.get<6>();
-
-### Reading bits from the middle
-
-    uint8_t data[2];
-    data[0] = 0b00000011;
-    data[1] = 0b10101110;
-    ...
-    BitstreamReader bs(data, 2);
-    uint16_t a = bs.getWithOffset<10>(6);//will get 10 bits starting at bitoffset 6
+    std::vector<uint8_t> vec{213,185,0,5,8,3,1,2,3,4,5};
+    BiteStream bs(std::move(vec));
+    std::cout << (int)bs.get<uint8_t>(4) << std::endl;
+    std::cout << (int)bs.get<uint8_t>(7) << std::endl;
+    std::cout << (int)bs.get<uint8_t>(3) << std::endl;
+    std::cout << (int)bs.get<uint16_t>(16) << std::endl;
 
 
-### Example: Parsing RTCP Packets
+### Example: Parsing Custom Package
 
-            0                   1                   2                   3
-            0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-          +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    header|V=2|P|    RC   |   PT=SR=200   |             length            |
-          +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-          |                         SSRC of sender                        |
-          +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-    sender|              NTP timestamp, most significant word             |
-    info  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-          |             NTP timestamp, least significant word             |
-          +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-          |                         RTP timestamp                         |
-          +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-          |                     sender's packet count                     |
-          +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-          |                      sender's octet count                     |
-          +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+             0                   1                   2                   3
+             0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+     header|    msgType    |     msgID     |            msgBSD             |
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+     header|                            msgSize                            |
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+     header|                           msgStamp                            |
+           +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+    payload|                          msgPayload                           |
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    payload|                          msgPayload                           |
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    payload|                          msgPayload                           |
+           +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+   
 
 Writing the code for the parser is now straight forward:
 
-    uint8_t rtcp_packet[24];
-    ... // copy data from network receive
-    BitstreamReader bs(rtcp_packet, 24);
-    uint8_t version = bs.get<2>();
-    uint8_t padding = bs.get<1>();
-    uint8_t rc = bs.get<5>();
-    uint8_t packetType = bs.get<8>();
-    uint16_t length = bs.get<16>();
-    uint32_t ssrc = bs.get<32>();
-    uint64_t ntpTimestamp = bs.get<64>();
-    uint32_t rtpTimestamp = bs.get<32>();
-    uint32_t packetCount = bs.get<32>();
-    uint32_t octetCount = bs.get<32>();
+    std::vector<uint8_t> msg{2,1,0,0,0,0,0,192,90,123,112,175,72,101,108,108,111,32,119,111,114,108,100,0};
+    BiteStream bs(std::move(msg));
+    std::cout << "msgType\t" << (int)bs.get<uint8_t>() << std::endl;
+    std::cout << "msgID\t" << (int)bs.get<uint8_t>(8) << std::endl;
+    std::cout <<"msgBSD\t" <<  bs.get<uint16_t>() << std::endl;
+    std::cout <<"msgSize\t" <<  bs.get<uint32_t>(32) << std::endl;
+    std::cout <<"msgStamp\t" <<  bs.get<uint32_t>() << std::endl;
+    auto v = bs.getRest();
+    std::cout <<"msgPayload\t" <<  std::string((char*)v.data(), v.size()) << std::endl;
 
