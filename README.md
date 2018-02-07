@@ -12,12 +12,11 @@ write or read incoming/outgoing datastreams for protocols
 
 ### Writing bits to a stream
 
-    std::vector<uint8_t> vec{};
-    BiteStream bs(std::move(vec));
+    BiteStream bs();
     bs.put<uint8_t>(13,4);
     bs.put<uint8_t>(45,7);
     bs.put<uint8_t>(6,3);
-    bs.put<uint16_t>(16385,16);
+    bs.put<uint16_t>(16385);
 
 ### Reading bits from a stream
 
@@ -26,7 +25,7 @@ write or read incoming/outgoing datastreams for protocols
     std::cout << (int)bs.get<uint8_t>(4) << std::endl;
     std::cout << (int)bs.get<uint8_t>(7) << std::endl;
     std::cout << (int)bs.get<uint8_t>(3) << std::endl;
-    std::cout << (int)bs.get<uint16_t>(16) << std::endl;
+    std::cout << (int)bs.get<uint16_t>() << std::endl;
 
 
 ### Example: Parsing Custom Package
