@@ -78,6 +78,18 @@ public:
     }
     
     template<class T>
+    void put(const T* begin, const T* end) {
+        if(m_offset%8) {
+            m_data.insert(m_data.end(), begin, end);
+        } else {
+            for(T* p = begin; p != end; ++p) {
+	        uint8_t val = static_cast<unit8_t>(*p);
+                put<uint8_t>(val);
+            }
+        }
+    }
+    
+    template<class T>
     T get(size_t size = 0)
     {
         T res = 0;
