@@ -123,6 +123,13 @@ public:
         return res;
     }
     
+    
+    template<class T>
+    T getWithOffset(size_t offset, size_t size = 0) {
+        m_offset = offset;
+        return get<T>(size);
+    }
+    
     std::vector<uint8_t> getRest() {
         size_t rest = 8 - m_offset % 8;
         if(rest != 8) {
@@ -134,6 +141,10 @@ public:
         return std::vector<uint8_t>(m_data.begin() + (m_offset / 8), m_data.end());
     }
     
+    const std::vector<uint8_t>& getData() const {
+        return m_data;
+    }
+        
     std::vector<uint8_t> releaseData() {
         return std::move(m_data);
     }
