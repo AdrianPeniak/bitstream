@@ -50,8 +50,10 @@ public:
         size_t offsetInByte = (m_offset) % 8;
         size_t spaceLeftInFirstByte = 8 - offsetInByte;
         size_t bitsForFirstByte = std::min(size, spaceLeftInFirstByte);
-        size_t resize = ((size%8) ? size/8 +1 : size/8) + index ;
-        m_data.resize(resize);
+        size_t resize = ((size + m_offset)%8) ? (size + m_offset)/8 + 1 : (size + m_offset)/8;
+        if(resize != m_data.size()) {
+            m_data.resize(resize);
+        }
         if (size <= spaceLeftInFirstByte) {
             T mask = 0;
             std::memset(&mask, 255, sizeof(mask));
