@@ -19,24 +19,30 @@ class BiteStream {
 public:
     BiteStream()
     : m_data(),
-      m_offset(0) {
+      m_offset(0),
+      m_size(0) {
     }
     
     BiteStream(std::vector<uint8_t>&& data)
     : m_data(std::move(data)),
-      m_offset(0) {
+      m_offset(0),
+      m_size(m_data.size()*8)
+    {
     }
     
     ~BiteStream() = default;
     
     BiteStream(BiteStream&& other)
     : m_data(std::move(other.m_data)), 
-      m_offset(other.m_offset) {
+      m_offset(other.m_offset),
+      m_size(m_data.size()*8)
+    {
     }
     
     BiteStream& operator=(BiteStream&& other) {
         m_data = std::move(other.m_data);
         m_offset = other.m_offset;
+        m_size = m_data.size()*8;
         return *this;
     }
     
@@ -87,7 +93,7 @@ public:
     void put(const T begin, const T end) {
         if(m_offset%8) {
             m_data.insert(m_data.end(), begin, end);
-            m_size += std::distance(begin, end);
+            m_size += (std::distance(begin, end)*8);
         } else {
             for(T p = begin; p != end; ++p) {
                 put<uint8_t>(*p);
