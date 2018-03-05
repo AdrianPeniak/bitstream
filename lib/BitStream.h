@@ -78,17 +78,27 @@ public:
                 }
             }
         }
+        m_size = (m_size < m_offset) ? m_offset : m_size;
     }
+    
+    
     
     template<class T>
     void put(const T begin, const T end) {
         if(m_offset%8) {
             m_data.insert(m_data.end(), begin, end);
+            m_size += std::distance(begin, end);
         } else {
             for(T p = begin; p != end; ++p) {
                 put<uint8_t>(*p);
             }
         }
+    }
+    
+    template<class T>
+    void putToEnd(const T begin, const T end) {
+        m_offset = m_size;
+        put(begin, end);
     }
     
     template<class T>
@@ -173,6 +183,7 @@ private:
     
 private:
     std::vector<uint8_t> m_data;
+    size_t m_size;
     size_t m_offset;
 };
 
