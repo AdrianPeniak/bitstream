@@ -189,8 +189,8 @@ private:
     
 private:
     std::vector<uint8_t> m_data;
-    size_t m_size;
     size_t m_offset;
+    size_t m_size;
 };
 
 #endif /* BITESTREAM_H */
