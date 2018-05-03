@@ -39,7 +39,7 @@ public:
     {
     }
     
-    Bittream& operator=(BitStream&& other) {
+    BitStream& operator=(BitStream&& other) {
         m_data = std::move(other.m_data);
         m_offset = other.m_offset;
         m_size = m_data.size()*8;
