@@ -1,13 +1,13 @@
 /* 
  * Fork: https://github.com/marcmo/bitstream
- * File:   BiteStream.h
+ * File:   BitStream.h
  * Edited: Adrian Peniak
  *
  * Created on February 7, 2018, 4:07 PM
  */
 
-#ifndef BITESTREAM_H
-#define BITESTREAM_H
+#ifndef BITSTREAM_H
+#define BITSTREAM_H
 
 #include <cstdint>
 #include <cstdlib>
@@ -15,31 +15,31 @@
 #include <vector>
 #include <cassert>
 
-class BiteStream {
+class BitStream {
 public:
-    BiteStream()
+    BitStream()
     : m_data(),
       m_offset(0),
       m_size(0) {
     }
     
-    BiteStream(std::vector<uint8_t>&& data)
+    BitStream(std::vector<uint8_t>&& data)
     : m_data(std::move(data)),
       m_offset(0),
       m_size(m_data.size()*8)
     {
     }
     
-    ~BiteStream() = default;
+    ~BitStream() = default;
     
-    BiteStream(BiteStream&& other)
+    BitStream(BitStream&& other)
     : m_data(std::move(other.m_data)), 
       m_offset(other.m_offset),
       m_size(m_data.size()*8)
     {
     }
     
-    BiteStream& operator=(BiteStream&& other) {
+    Bittream& operator=(BitStream&& other) {
         m_data = std::move(other.m_data);
         m_offset = other.m_offset;
         m_size = m_data.size()*8;
@@ -172,8 +172,8 @@ public:
         m_offset = 0;
     }
     
-    BiteStream(BiteStream&) = delete;
-    BiteStream& operator=(BiteStream&) = delete;
+    BitStream(BitStream&) = delete;
+    BitStream& operator=(BitStream&) = delete;
     
 private:
     uint8_t mask(uint8_t from, uint8_t length)
@@ -193,4 +193,4 @@ private:
     size_t m_size;
 };
 
-#endif /* BITESTREAM_H */
+#endif /* BITSTREAM_H */
